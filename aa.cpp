@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <cstdlib>
 #include <Eigen/Eigen>
+#include <sys/time.h>
+
 
 #define k 3//簇的数目
 #define m 1
@@ -91,8 +93,7 @@ void KMeans(vector<Tuple>& tuples){
 	for(i=0;i<k;){
 		int iToSelect = rand()%tuples.size();
 		if(means[0][iToSelect].size() == 0){
-			for(int j=0; j<dimNum; ++j)
-			{
+			for(int j=0; j<dimNum; ++j){
 				means[0][i].push_back(tuples[iToSelect][j]);
 			}
 			i++;
@@ -107,14 +108,11 @@ void KMeans(vector<Tuple>& tuples){
 	double oldVar=getVar(clusters,means[0]);
 
     //更新每个簇的中心点
-    for (i = 0; i < k; i++) {
-			means[1][i] = getMeans(clusters[i]);
-	}
+    for (i = 0; i < k; i++) 
+		means[1][i] = getMeans(clusters[i]);
 	
 	for (i = 0; i < k; i++) //清空每个簇
-		{
-			clusters[i].clear();
-		}
+		clusters[i].clear();
 
     //根据默认的质心给簇赋值
 	for(i=0;i<tuples.size();i++){
@@ -125,34 +123,36 @@ void KMeans(vector<Tuple>& tuples){
 	double newVar=getVar(clusters,means[1]);
 
     //更新每个簇的中心点
-    for (i = 0; i < k; i++) {
+    for (i = 0; i < k; i++) 
 			means[2][i] = getMeans(clusters[i]);
-	}
 	
 	for (i = 0; i < k; i++) //清空每个簇
-		{
 			clusters[i].clear();
-		}
 
     double f[10][10][3],g[10][10][3],gamma,x[10][10][3],t_f[10][10][3],t_g[10][10][3];
     int m_k,mark=0;
     int p;
 	for(p=0;p<2;p++){
     	for(int q=0 ; q<2; q++){
-			f[p][0][q]=means[p+1][0][q+1]-means[p][0][q+1];
-			f[p][1][q]=means[p+1][1][q+1]-means[p][1][q+1];
-			f[p][2][q]=means[p+1][2][q+1]-means[p][2][q+1];
-			g[p][0][q]=means[p+1][0][q+1];
-			g[p][1][q]=means[p+1][1][q+1];
-			g[p][2][q]=means[p+1][2][q+1];
-			x[p][0][q]=means[p][0][q+1];
-			x[p][1][q]=means[p][1][q+1];
-			x[p][2][q]=means[p][2][q+1];
+			for(int r=0; r<3; r++){
+				f[p][r][q]=means[p+1][r][q+1]-means[p][r][q+1];
+				g[p][r][q]=means[p+1][r][q+1];
+				x[p][r][q]=means[p][r][q+1];
+			}
+			// f[p][0][q]=means[p+1][0][q+1]-means[p][0][q+1];
+			// f[p][1][q]=means[p+1][1][q+1]-means[p][1][q+1];
+			// f[p][2][q]=means[p+1][2][q+1]-means[p][2][q+1];
+			// g[p][0][q]=means[p+1][0][q+1];
+			// g[p][1][q]=means[p+1][1][q+1];
+			// g[p][2][q]=means[p+1][2][q+1];
+			// x[p][0][q]=means[p][0][q+1];
+			// x[p][1][q]=means[p][1][q+1];
+			// x[p][2][q]=means[p][2][q+1];
     	}
 	}
 	if(abs(newVar - oldVar) <= 1){	
-		cout<<"The result is:\n";
-		print(clusters);
+		// cout<<"The result is:\n";
+		// print(clusters);
 		return;
 	}
     for(p=0; ;p++){
@@ -201,15 +201,15 @@ void KMeans(vector<Tuple>& tuples){
 
 		//根据默认的质心给簇赋值
 		for(i=0;i<tuples.size();i++){
-			lable=clusterOfTuple(means[p],tuples[i]);
+			lable=clusterOfTuple(means[p+1],tuples[i]);
 			clusters[lable].push_back(tuples[i]);
 		}
 		oldVar = newVar;
 		newVar = getVar(clusters,means[p+1]); //计算新的准则函数值
 
 		if(abs(newVar - oldVar) <= 1){	
-			cout<<"The result is:\n";
-			print(clusters);
+			//cout<<"The result is:\n";
+			//print(clusters);
 			return;
 		}
     }
@@ -281,10 +281,13 @@ void KMeans(vector<Tuple>& tuples){
 	// }
 }
 int main(){
-
+    struct  timeval  start;
+    struct  timeval  end;
+    unsigned long timer;
+	ofstream  time( "time_aa",ios::app);
 	char fname[256]="test";
     dimNum=3;
-    dataNum=150;
+    dataNum=100;
 	ifstream infile(fname);
 	if(!infile){
 		cout<<"不能打开输入的文件"<<fname<<endl;
@@ -308,6 +311,12 @@ int main(){
 
 	cout<<endl<<"开始聚类"<<endl;
 	
-	KMeans(tuples);
+	//for(int i=0;i<1000;i++){
+		gettimeofday(&start,NULL); 
+		KMeans(tuples);
+		gettimeofday(&end,NULL);
+		timer =1000000 * (end.tv_sec-start.tv_sec)+ end.tv_usec-start.tv_usec;
+		time<<"the k is "<<k<<", the time is "<<timer<<" us"<<endl;
+	//}	
 	return 0;
 }

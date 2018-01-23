@@ -20,7 +20,7 @@ int main()
 	int random1, random2;
 	double x;
 	srand((unsigned)time(NULL));  
-	for (i = 0; i< 81 ; i++) {
+	for (i = 0; i<1000000 ; i++) {
 			input =rand();
 			x =(input %10000)/10000.0;
 			x = x +50;

@@ -2,8 +2,9 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
-#include <math.h>
-#include <stdlib.h>
+#include <cmath>
+#include<sys/time.h>
+#include <cstdlib>
 #define k 3//簇的数目
 using namespace std;
 //存放元组的属性信息
@@ -13,8 +14,7 @@ int dataNum;//数据集中数据记录数目
 int dimNum;//每条记录的维数
 
 //计算两个元组间的欧几里距离
-double getDistXY(const Tuple& t1, const Tuple& t2) 
-{
+double getDistXY(const Tuple& t1, const Tuple& t2) {
 	double sum = 0;
 	for(int i=1; i<=dimNum; ++i)
 	{
@@ -67,8 +67,7 @@ Tuple getMeans(const vector<Tuple>& cluster){
 	//cout<<"sum:"<<sum<<endl;
 }
 
-void print(const vector<Tuple> clusters[])
-{
+void print(const vector<Tuple> clusters[]){
 	for(int lable=0; lable<k; lable++)
 	{
 		cout<<"第"<<lable+1<<"个簇："<<endl;
@@ -134,20 +133,16 @@ void KMeans(vector<Tuple>& tuples){
 	}
 
 	cout<<"The result is:\n";
-	print(clusters);
+	//print(clusters);
 }
 int main(){
-
+    struct  timeval  start;
+    struct  timeval  end;
+    unsigned long timer;
+	ofstream  time( "time",ios::app);
 	char fname[256]="test";
-	// cout<<"请输入存放数据的文件名： ";
-	// cin>>fname;
-	// cout<<endl<<" 请依次输入: 维数 样本数目"<<endl;
-	// cout<<endl<<" 维数dimNum: ";
-	// cin>>dimNum;
-	// cout<<endl<<" 样本数目dataNum: ";
-	// cin>>dataNum;
-    dimNum=3;
-    dataNum=150;
+    dimNum=3;// cout<<endl<<" 维数dimNum: ";
+    dataNum=100;	// cout<<endl<<" 样本数目dataNum: ";
 	ifstream infile(fname);
 	if(!infile){
 		cout<<"不能打开输入的文件"<<fname<<endl;
@@ -155,8 +150,7 @@ int main(){
 	}
 	vector<Tuple> tuples;
 	//从文件流中读入数据
-	for(int i=0; i<dataNum && !infile.eof(); ++i)
-	{
+	for(int i=0; i<dataNum && !infile.eof(); ++i){
 		string str;
 		getline(infile, str);
 		istringstream istr(str);
@@ -170,6 +164,12 @@ int main(){
 	}
 
 	cout<<endl<<"开始聚类"<<endl;
-	KMeans(tuples);
+	//for(int i=0;i<10;i++){
+		gettimeofday(&start,NULL); 
+		KMeans(tuples);
+		gettimeofday(&end,NULL);
+		timer =1000000 * (end.tv_sec-start.tv_sec)+ end.tv_usec-start.tv_usec;
+		time<<"the k is "<<k<<", the time is "<<timer<<" us"<<endl;
+	//}
 	return 0;
 }
