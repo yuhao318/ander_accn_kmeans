@@ -18,15 +18,21 @@ int main()
 	int i;
 	int j;
 	int random1, random2;
+	double x;
 	srand((unsigned)time(NULL));  
-	for (i = 0; i <2^10 ; i++) {
+	for (i = 0; i< 81 ; i++) {
 			input =rand();
-			if(input>=50)input =input %50;
-			InputFile << input;
+			x =(input %10000)/10000.0;
+			x = x +50;
+			InputFile << x<<' ';
+			
+			input =rand();
+			x =(input %10000)/10000.0;
+			x = x +50;
+			InputFile << x;
+			
 			InputFile << endl;
 		}
-		
-
     return 0;
 }
 
